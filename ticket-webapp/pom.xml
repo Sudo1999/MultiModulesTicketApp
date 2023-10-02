@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <!--============================================-->
+  <!-- ==== Informations générales du projet ==== -->
+  <!--============================================-->
+  
+  <parent>
+    <groupId>com.openclassroom.apache</groupId>
+    <artifactId>multi-modules</artifactId>
+    <version>1.0-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>ticket-webapp</artifactId>
+  <packaging>war</packaging>
+  <name>Maven Ticket Webapp</name>
+  <url>http://www.example.com</url>
+  <description>
+    Module Webapp du projet Multi-Modules
+  </description>
+  
+  <!-- ==== Propriétés ==== -->
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>    
+    <!-- Nom "public" de l'application -->
+    <application.name>TicketTac</application.name>
+    <!-- Format à utiliser pour afficher la date du build -->
+    <maven.build.timestamp.format>dd/MM/yyyy</maven.build.timestamp.format>
+    <!-- Contournement du bug de l'absence de la propriété maven.build.timestamp lors du filtrage des ressources -->
+    <build.timestamp>${maven.build.timestamp}</build.timestamp>
+  </properties>
+
+  <!--===================================-->
+  <!-- ==== Gestion des dépendances ==== -->
+  <!--===================================-->
+
+  <dependencies>
+    <!-- ===== Dépendances d'autres modules du projet ===== -->
+    <dependency>
+        <groupId>com.openclassroom.apache</groupId>
+        <artifactId>ticket-business</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>com.openclassroom.apache</groupId>
+        <artifactId>ticket-model</artifactId>
+    </dependency>
+    
+    <!-- ===== Bibliothèques tierces ===== -->
+    <dependency>
+        <groupId>org.apache.commons</groupId>
+        <artifactId>commons-collections4</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>org.apache.commons</groupId>
+        <artifactId>commons-text</artifactId>
+    </dependency>
+    
+    <!-- Illustration des différents scopes (Voir le pom.xml du projet parent) -->
+    <dependency>
+        <groupId>junit</groupId>
+        <artifactId>junit</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>javax.servlet</groupId>
+        <artifactId>javax.servlet-api</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>javax.validation</groupId>
+        <artifactId>validation-api</artifactId>
+    </dependency>    
+    <dependency>
+        <groupId>org.apache.bval</groupId>
+        <artifactId>bval-jsr</artifactId>
+    </dependency>
+  </dependencies>
+
+  <!--============================-->
+  <!-- ==== Build et plugins ==== -->
+  <!--============================-->
+  
+  <!-- ==== Définition de profils ==== -->
+	
+  <profiles>
+    <!-- Profil pour l'environnement de développement -->
+    <profile>
+        <id>dev</id>
+    </profile>
+    <!-- Profil pour l'environnement de test -->
+    <profile>
+        <id>test</id>
+    </profile>
+    <!-- Profil pour l'environnement de production -->
+    <profile>
+        <id>prod</id>
+        <!-- Aucune version SNAPSHOT ne doit être envoyée dans un environnement de production -->
+        <build>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-enforcer-plugin</artifactId>
+                    <executions>
+                        <execution>
+                            <id>enforce-no-snapshot-in-prod</id>
+                            <phase>validate</phase>
+                            <goals>
+                                <goal>enforce</goal>
+                            </goals>
+                            <configuration>
+                                <rules>
+                                    <!-- Ni le projet ni son parent ne doivent être en SNAPSHOT -->
+                                    <requireReleaseVersion />
+                                    <!-- Aucune dépendance ne doit être en SNAPSHOT -->
+                                    <requireReleaseDeps />
+                                </rules>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+            </plugins>
+        </build>
+    </profile>
+  </profiles>
+  
+  <!-- ==== Build et plugins ==== -->
+
+  <build>
+    <finalName>ticket-webapp</finalName>
+	<plugins>
+		
+		<!-- Maven Enforcer Plugin => Obligation de choisir un profil dès la phase de validation -->
+		<plugin>
+		    <groupId>org.apache.maven.plugins</groupId>
+		    <artifactId>maven-enforcer-plugin</artifactId>
+		    <executions>
+		        <execution>
+		             <!-- Nom unique pour définir l'exécution -->
+		            <id>enforce-profile</id>
+		            <!-- Association de cette exécution à la phase "validate" -->
+		            <phase>validate</phase>
+		            <!-- Choix du goal "enforce" -->
+		            <goals>
+		                <goal>enforce</goal>
+		            </goals>
+		            <!-- Configuration du plugin -->
+		            <configuration>
+		                <rules>
+		                    <requireActiveProfile>
+		                        <profiles>dev,test,prod</profiles>
+		                        <all>false</all>
+		                    </requireActiveProfile>
+		                </rules>
+		            </configuration>
+		        </execution>
+		    </executions>
+		</plugin>
+		
+		<!-- Maven War Plugin => Ajout d'un header, d'un footer et d'un fichier About
+		  avec des informations extraites du pom.xml grâce au <filtering> -->
+        <plugin>
+		    <groupId>org.apache.maven.plugins</groupId>
+		    <artifactId>maven-war-plugin</artifactId>
+            <configuration>
+                <webResources>
+                    <resource>
+						<!-- Dans un projet Maven standard, le répertoire des web ressources est src/main/webapp -->
+                        <directory>src\main\webapp</directory>
+                        <filtering>true</filtering>
+                        <includes>
+                            <include>jsp\_include\header.jsp</include>
+                            <include>jsp\_include\footer.jsp</include>
+                            <include>jsp\about.jsp</include>
+                        </includes>
+                    </resource>
+                </webResources>
+            </configuration>
+		</plugin>
+		
+	</plugins>
+  </build>
+  
+</project>

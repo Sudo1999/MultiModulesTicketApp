@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<faqs xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/FML/1.0.1"
+      xsi:schemaLocation="http://maven.apache.org/FML/1.0.1 http://maven.apache.org/xsd/fml-1.0.1.xsd"
+      title="Foire Aux Questions (FAQ)"
+      toplink="false">
+
+    <part id="general">
+        <title>Général</title>
+        <faq id="when-fml">
+            <question>
+              Dans quels cas utiliser le format « fml » ?
+            </question>
+            <answer>
+              <p>
+                <p>
+                Le Format Markup Language (fml) est particulièrement adapté à l'écriture d'une Foire Aux Questions (FAQ).
+                </p>
+                <p>
+                Il est structuré selon un standard Extensible Markup Language (XML).
+                </p>
+                <p>
+                Maven convertit le fichier mon-fichier.fml en page HTML mon-fichier.html accessible par l'intermédiaire du navigateur.
+                </p>
+              </p>
+            </answer>
+        </faq>
+
+        <faq id="when-md">
+            <question>
+              Dans quels cas utiliser le format « md » ?
+            </question>
+            <answer>
+              <p>
+                <p>
+                Le format Markdown (md) est utilisé pour les pages de documentation.
+                </p>
+                <p>
+                Maven convertit le fichier mon-fichier.md en page HTML mon-fichier.html accessible par l'intermédiaire du navigateur.
+                </p>
+              </p>
+            </answer>
+        </faq>
+    </part>
+
+    <part id="install">
+        <title>Installation</title>
+        <faq id="how-install">
+            <question>
+              Comment générer le site ?
+            </question>
+            <answer>
+              <p>
+                <p>
+                Dans un projet multi-module, la génération du site est un peu plus complexe que pour un projet simple. Il va falloir que Maven :
+                - génère un site pour le projet parent et pour chaque module (cela correspond au goal « site » du plugin maven-site-plugin) ;
+                - agrège tous ces sites en un seul.
+                </p>
+                <p>
+                Le goal « stage » du plugin maven-site-plugin génère le site agrégé dans le répertoire target/staging.
+                </p>
+                <source>  => mvn package site site:stage</source>
+              </p>
+            </answer>
+        </faq>
+    </part>
+</faqs>

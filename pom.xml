@@ -1,0 +1,435 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <!--===================================================-->
+  <!-- ==== Informations générales du projet parent ==== -->
+  <!--===================================================-->
+  
+  <groupId>com.openclassroom.apache</groupId>
+  <artifactId>multi-modules</artifactId>
+  <version>1.0-SNAPSHOT</version>
+  <packaging>pom</packaging>
+  
+  <name>multi-modules</name>
+  <url>http://www.example.com</url>
+  <description>
+    Projet issu du tutoriel Organisez et packagez une application Java avec Apache Maven sur OpenClassrooms
+  </description>
+  
+  <organization>
+	  <name>Mon entreprise</name>
+	  <url>http://www.mon-entreprise.com</url>
+  </organization>
+
+  <!-- ==== Modules ==== -->
+  
+  <modules>
+    <module>ticket-webapp</module>
+    <module>ticket-batch</module>
+    <module>ticket-business</module>
+    <module>ticket-consumer</module>
+    <module>ticket-model</module>
+  </modules>
+
+  <!-- ==== Propriétés ==== -->
+  
+  <properties>
+    <maven-checkstyle-plugin-artifactId>maven-checkstyle-plugin</maven-checkstyle-plugin-artifactId>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <maven.compiler.source>17</maven.compiler.source>
+    <maven.compiler.target>${maven.compiler.source}</maven.compiler.target>
+    <!-- On peut apparemment (non testé) remplacer les deux lignes précédentes par une seule : -->
+    <!--<maven.compiler.release>17</maven.compiler.release>-->
+  </properties>
+  
+  <!-- ==== Distribution Management ==== -->
+  <!-- Informations de déploiement du site -->
+  
+  <distributionManagement>
+    <site>
+      <id>site-projet</id>
+      <url>scp://localhost/tmp/</url>
+    </site>
+  </distributionManagement>
+
+  <!--===================================-->
+  <!-- ==== Gestion des dépendances ==== -->
+  <!--===================================-->
+  
+  <!-- Dans le POM du projet parent, nous listons les dépendances et leur version de manière globale.
+    Dans le POM de chaque module, nous définissons quelles sont les dépendances à utiliser. -->
+    
+  <dependencyManagement>
+    <dependencies>
+		
+      <!-- ===== Dépendances de tous les modules du projet ===== -->
+      <dependency>
+        <groupId>com.openclassroom.apache</groupId>
+        <artifactId>ticket-batch</artifactId>
+        <version>1.0-SNAPSHOT</version>
+      </dependency>
+      <dependency>
+        <groupId>com.openclassroom.apache</groupId>
+        <artifactId>ticket-webapp</artifactId>
+        <version>1.0-SNAPSHOT</version>
+      </dependency>
+      <dependency>
+        <groupId>com.openclassroom.apache</groupId>
+        <artifactId>ticket-business</artifactId>
+        <version>1.0-SNAPSHOT</version>
+      </dependency>
+      <dependency>
+        <groupId>com.openclassroom.apache</groupId>
+        <artifactId>ticket-consumer</artifactId>
+        <version>1.0-SNAPSHOT</version>
+      </dependency>
+      <dependency>
+        <groupId>com.openclassroom.apache</groupId>
+        <artifactId>ticket-model</artifactId>
+        <version>1.0-SNAPSHOT</version>
+      </dependency>
+      
+      <!-- ===== Bibliothèques tierces ===== -->
+      <dependency>
+        <groupId>org.apache.commons</groupId>
+        <artifactId>commons-collections4</artifactId>
+        <version>4.4</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.commons</groupId>
+        <artifactId>commons-text</artifactId>
+        <version>1.10.0</version>
+        <!-- Exclusion de la dépendance automatique vers commons-lang3 -->
+        <exclusions>
+          <exclusion>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>      
+      <!-- Ajoutés pour tenter (en vain) de résoudre un problème avec maven-surefire-report-plugin:3.1.2 qui dépend du premier. -->
+      <!-- https://mvnrepository.com/artifact/org.codehaus.plexus/plexus-containers -->
+      <!--<dependency>
+        <groupId>org.codehaus.plexus</groupId>
+        <artifactId>plexus-containers</artifactId>
+        <version>2.1.1</version>
+        <type>pom</type>
+      </dependency>
+      <dependency>
+        <groupId>org.codehaus.plexus</groupId>
+        <artifactId>plexus-container-default</artifactId>
+        <version>2.1.1</version>
+      </dependency>
+      <dependency>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>flatten-maven-plugin</artifactId>
+        <version>1.5.0</version>
+      </dependency>-->
+      <!-- Dépendance apparemment nécessaire au plugin maven-checkstyle-plugin (en fait non, le plugin gère tout seul...) -->
+      <!-- Elle ne veut pas se télécharger avec cette version => Project Explorer => Clic droit => Maven => Add Dependency.
+        La commande « mvn site » réinstalle malheureusement la version 9.3... => Cet ajout de dépendance ne sert à rien. -->
+      <!-- https://mvnrepository.com/artifact/com.puppycrawl.tools/checkstyle -->
+      <!--<dependency>
+        <groupId>com.puppycrawl.tools</groupId>
+        <artifactId>checkstyle</artifactId>
+        <version>10.12.3</version>
+      </dependency>-->
+      
+      <!-- == Illustration des différents scopes (test, provided, compile, runtime) == -->
+      <dependency>
+        <!-- Cette bibliothèque de test unitaire n'est nécessaire que lors de la phase de test. -->
+        <groupId>junit</groupId>
+        <artifactId>junit</artifactId>
+        <version>4.13.2</version>
+        <scope>test</scope>
+      </dependency>
+      
+      <dependency>
+        <!-- Cette bibliothèque est nécessaire lors de la compilation pour créer une servlet.
+	          Elle ne doit cependant pas se trouver dans les WAR générés car elle entrerait en conflit avec celle
+	          fournie par le serveur d'application Java EE lors de l'exécution. -->
+        <groupId>javax.servlet</groupId>
+        <artifactId>javax.servlet-api</artifactId>
+        <version>4.0.1</version>
+        <scope>provided</scope>
+      </dependency>
+      
+      <dependency>
+        <!-- Cette bibliothèque est nécessaire lors de la compilation pour pouvoir exploiter ses annotations dans les Beans. -->
+        <groupId>javax.validation</groupId>
+        <artifactId>validation-api</artifactId>
+        <version>2.0.1.Final</version>
+        <scope>compile</scope>
+      </dependency>
+      
+      <dependency>
+        <!-- Cette bibliothèque est une implémentation de l'API de validation des Beans précédente.
+	          Le code ne l'utilise pas directement, c'est pourquoi elle n'est pas nécessaire à la compilation.
+	          Par contre à l'exécution, elle est indispensable pour permettre la validation des Beans. -->
+        <groupId>org.apache.bval</groupId>
+        <artifactId>bval-jsr</artifactId>
+        <version>2.0.6</version>
+        <scope>runtime</scope>
+      </dependency>
+      
+      <!-- Utilisation d'une « Bill of Materials » (BOM) par l'import de son POM -->
+      <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-framework-bom</artifactId>
+        <version>6.0.11</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      
+    </dependencies>
+  </dependencyManagement>
+
+  <!--============================-->
+  <!-- ==== Build et plugins ==== -->
+  <!--============================-->
+  
+  <build>
+    <pluginManagement>
+      <plugins>
+		  
+      <!-- Lock down plugins versions to avoid using Maven defaults (may be moved to parent pom) :
+        Plugins fournis au départ lors de la création du projet par archetype:generate etc...
+        Tous appartiennent au <groupId> org.apache.maven.plugins </groupId>. -->
+      
+        <!-- => clean lifecycle, see https://maven.apache.org/ref/current/maven-core/lifecycles.html#clean_Lifecycle -->
+        <plugin>
+          <artifactId>maven-clean-plugin</artifactId>
+          <version>3.3.1</version>
+        </plugin>
+        
+        <!-- => default lifecycle, jar packaging: 
+         see https://maven.apache.org/ref/current/maven-core/default-bindings.html#Plugin_bindings_for_jar_packaging -->
+        <plugin>
+          <artifactId>maven-resources-plugin</artifactId>
+          <version>3.3.1</version>
+        </plugin>
+        <plugin>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <version>3.11.0</version>
+          <configuration>
+            <!-- Show Deprecation and Warnings -->
+            <showDeprecation>true</showDeprecation>
+            <showWarnings>true</showWarnings>
+          </configuration>
+        </plugin>
+        <plugin>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <version>3.1.2</version>
+        </plugin>
+        <plugin>
+          <artifactId>maven-jar-plugin</artifactId>
+          <version>3.3.0</version>
+        </plugin>
+        <plugin>
+          <artifactId>maven-install-plugin</artifactId>
+          <version>3.1.1</version>
+        </plugin>
+        <plugin>
+          <artifactId>maven-deploy-plugin</artifactId>
+          <version>3.1.1</version>
+        </plugin>
+        
+        <!-- => site lifecycle, see https://maven.apache.org/ref/current/maven-core/lifecycles.html#site_Lifecycle -->
+        <plugin>
+          <artifactId>maven-site-plugin</artifactId>
+          <version>4.0.0-M9</version>
+          <configuration>
+            <!-- Choix d'un site en français => Un répertoire fr est automatiquement créé dans target/staging par le goal site:stage.
+              Pour que les pages en plus (architecture.md, faq.fml) soient affichées, il faut déplacer tout le contenu de src/site
+              dans un répertoire src/site/fr, à l'exception du fichier site.xml qui reste dans src/site. -->
+            <locales>fr</locales>
+          </configuration>
+        </plugin>
+        <!-- Curieusement, l'absence de déclaration de ce plugin ici ne provoque aucune erreur -->
+        <plugin>
+          <artifactId>maven-project-info-reports-plugin</artifactId>
+          <version>3.4.0</version>
+        </plugin>
+        
+        <!-- Autres plugins -->
+        <plugin>
+          <!-- Ajouté pour résoudre un problème de validation du plugin -->
+          <artifactId>maven-war-plugin</artifactId>
+          <version>3.4.0</version>
+        </plugin>
+        <plugin>
+          <!-- Ajouté pour imposer le choix d'un profil pour la webapp -->
+          <artifactId>maven-enforcer-plugin</artifactId>
+          <version>3.4.0</version>
+        </plugin>
+        <!-- Génération des archives du Batch -->
+        <plugin>
+          <artifactId>maven-assembly-plugin</artifactId>
+          <version>3.6.0</version>
+        </plugin>
+        <!-- Génération d'un rapport sur les tests -->
+        <plugin>
+          <artifactId>maven-surefire-report-plugin</artifactId>
+          <version>3.1.2</version>
+        </plugin>
+        <!-- Génération d'un rapport JavaDoc -->
+        <plugin>
+          <artifactId>maven-javadoc-plugin</artifactId>
+          <version>3.6.0</version>
+        </plugin>
+        <!-- Génération d'un rapport d'analyse du code avec Checkstyle (en théorie) -->
+        <plugin>
+          <artifactId>maven-checkstyle-plugin</artifactId>
+          <version>3.3.0</version>
+          <!-- Upgrading Checkstyle at Runtime. Mais ça ne résout pas le problème, au contraire ça l'aggrave :
+            Failed during checkstyle configuration: cannot initialize module TreeWalker -->
+          <!--<dependencies>
+            <dependency>
+              <groupId>com.puppycrawl.tools</groupId>
+              <artifactId>checkstyle</artifactId>
+              <version>10.12.3</version>
+            </dependency>
+          </dependencies>-->
+        </plugin>
+        
+      </plugins>
+    </pluginManagement>
+  </build>
+
+  <!--================================-->
+  <!-- ==== Gestion des rapports ==== -->
+  <!--================================-->
+  
+  <!-- Pour avoir tous les détails voir le tutoriel :
+    https://openclassrooms.com/fr/courses/4503526-organisez-et-packagez-une-application-java-avec-apache-maven/
+    4610009-generez-un-site-pour-votre-projet#/id/r-4609978
+    Le goal stage du plugin site permet de générer le site agrégé dans target/staging (en doublon parfait de target/site,
+    à l'exception des modules, qui n'y sont pas) sans déployer => mvn clean package -Pdev site site:stage
+    ou mvn clean package -Pdev site site:stage -Dmaven.plugin.validation=VERBOSE pour le mode verbeux -->
+  
+  <reporting>
+    <plugins>
+      
+      <!-- ===== Rapport de base (DOCUMENTATION SUR LE PROJET => Info Projet) ===== -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-project-info-reports-plugin</artifactId>
+        
+        <!-- Sélection de quelques rapports seulement -->
+        <!--<reportSets>
+          <reportSet>
+            <reports>
+               Bienvenue dans le projet 
+              <report>index</report>
+               Résumé du projet 
+              <report>summary</report>
+               Plugins du projet 
+              <report>plugins</report>
+            </reports>
+          </reportSet>
+        </reportSets>-->
+      </plugin>
+      
+      <!-- ===== Rapport sur les tests (DOCUMENTATION SUR LE PROJET => Rapports Projet => Surefire) ===== -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-report-plugin</artifactId>
+        <configuration>
+          <linkXRef>false</linkXRef>
+        </configuration>
+        
+        <reportSets>
+          <!--<reportSet>
+            <reports>
+              <report>report-only</report>
+            </reports>
+          </reportSet>-->
+          <!-- ReportSet d'agrégation des rapports des sous-projets des modules -->
+          <reportSet>
+            <id>aggregate</id>
+            <reports>
+                <report>report</report>
+            </reports>
+            <!-- Ne pas exécuter ce sous-rapport dans les sous-projets -->
+            <inherited>false</inherited>
+            <configuration>
+                <aggregate>true</aggregate>
+            </configuration>
+          </reportSet>
+          <!-- ReportSet non agrégé, exécuté dans les sous-projets des modules -->
+          <reportSet>
+            <id>modules</id>
+            <reports>
+              <report>report</report>
+            </reports>
+            <!-- Exécuter ce sous-rapport dans les sous-projets -->
+            <inherited>true</inherited>
+            <configuration>
+              <aggregate>false</aggregate>
+            </configuration>
+          </reportSet>          
+        </reportSets>
+      </plugin>
+      
+      <!-- ===== Génération de la Javadoc (DOCUMENTATION SUR LE PROJET => Rapports Projet => Javadoc) ===== -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <configuration>
+          <quiet>true</quiet>
+          <locale>fr</locale>
+        </configuration>
+        
+        <reportSets>
+          <!-- ReportSet exécuté dans tous les modules -->
+          <reportSet>
+            <reports>
+              <report>javadoc</report>
+            </reports>
+          </reportSet>
+          <!-- ReportSet d'agrégation des rapports des sous-modules -->
+          <reportSet>
+            <id>aggregate</id>
+            <inherited>false</inherited>
+            <reports>
+              <report>aggregate</report>
+            </reports>
+          </reportSet>
+        </reportSets>
+      </plugin>
+      
+      <!-- ===== Rapport d'analyse du code (DOCUMENTATION SUR LE PROJET => Rapports Projet => Checkstyle) ===== -->
+      <!-- (Il faut rajouter le fichier checkstyle.xml dans src/build) -->
+      <!-- De guerre lasse, faute d'identifier le bug qui le met en échec, je renonce au rapport Checkstyle. -->
+      <!--<plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+        <configuration>
+          <configLocation>src/build/checkstyle.xml</configLocation>
+          <linkXRef>false</linkXRef>
+        </configuration>        
+        <reportSets>
+          <reportSet>
+            <reports>
+              <report>checkstyle</report>
+            </reports>
+          </reportSet>
+          <reportSet>
+            <id>checkstyle-aggregate</id>
+            <inherited>false</inherited>
+            <configuration>
+              <skipExec>true</skipExec>
+            </configuration>
+            <reports>
+              <report>checkstyle-aggregate</report>
+            </reports>
+          </reportSet>
+        </reportSets>
+      </plugin>-->
+      
+    </plugins>
+  </reporting>
+  
+</project>
