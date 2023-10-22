@@ -8,7 +8,7 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xs
   <!--===================================================-->
   
   <!-- Les commandes mvn clean package -Pdev site site:stage ou mvn clean package -Pjar site site:stage donnent accès
-    aux informations du projet à l'adresse C:\Users\Martine\Documents\Eclipse-workspace\multi-modules\target\staging\fr\index.html -->
+    aux informations du projet à l'adresse C:\Users\xxx\Documents\Eclipse-workspace\multi-modules\target\staging\fr\index.html -->
   
   <groupId>com.openclassroom.apache</groupId>
   <artifactId>multi-modules</artifactId>
