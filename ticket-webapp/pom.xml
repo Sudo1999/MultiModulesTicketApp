@@ -31,6 +31,7 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xs
     <maven.build.timestamp.format>dd/MM/yyyy</maven.build.timestamp.format>
     <!-- Contournement du bug de l'absence de la propriété maven.build.timestamp lors du filtrage des ressources -->
     <build.timestamp>${maven.build.timestamp}</build.timestamp>
+    <mainClass.address></mainClass.address>
   </properties>
 
   <!--===================================-->
@@ -122,16 +123,20 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xs
             </plugins>
         </build>
     </profile>
+    <!-- Profil géré au niveau du pom parent -->
+    <profile>
+        <id>jar</id>
+    </profile>
   </profiles>
   
   <!-- ==== Build et plugins ==== -->
 
   <build>
     <finalName>ticket-webapp</finalName>
-	<plugins>
+    <plugins>
 		
-		<!-- Maven Enforcer Plugin => Obligation de choisir un profil dès la phase de validation -->
-		<plugin>
+      <!-- Maven Enforcer Plugin => Obligation de choisir un profil dès la phase de validation -->
+      <plugin>
 		    <groupId>org.apache.maven.plugins</groupId>
 		    <artifactId>maven-enforcer-plugin</artifactId>
 		    <executions>
@@ -148,24 +153,24 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xs
 		            <configuration>
 		                <rules>
 		                    <requireActiveProfile>
-		                        <profiles>dev,test,prod</profiles>
+		                        <profiles>dev,test,prod,jar</profiles>
 		                        <all>false</all>
 		                    </requireActiveProfile>
 		                </rules>
 		            </configuration>
 		        </execution>
 		    </executions>
-		</plugin>
-		
-		<!-- Maven War Plugin => Ajout d'un header, d'un footer et d'un fichier About
-		  avec des informations extraites du pom.xml grâce au <filtering> -->
-        <plugin>
+      </plugin>
+		  
+      <!-- Maven War Plugin => Ajout d'un header, d'un footer et d'un fichier About
+        avec des informations extraites du pom.xml grâce au <filtering> -->
+      <plugin>
 		    <groupId>org.apache.maven.plugins</groupId>
 		    <artifactId>maven-war-plugin</artifactId>
             <configuration>
                 <webResources>
                     <resource>
-						<!-- Dans un projet Maven standard, le répertoire des web ressources est src/main/webapp -->
+                        <!-- Dans un projet Maven standard, le répertoire des web ressources est src/main/webapp -->
                         <directory>src\main\webapp</directory>
                         <filtering>true</filtering>
                         <includes>
@@ -176,9 +181,9 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xs
                     </resource>
                 </webResources>
             </configuration>
-		</plugin>
-		
-	</plugins>
+      </plugin>
+      
+    </plugins>
   </build>
   
 </project>

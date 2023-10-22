@@ -24,6 +24,7 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xs
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <mainClass.address>com.openclassroom.apache.batch.App</mainClass.address>
   </properties>
 
   <!--===================================-->
@@ -55,21 +56,20 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xs
   <build>
     <plugins>
 		
-    	<!-- Définition de la classe Main dans le Manifest lors de la génération du fichier JAR -->
-        <plugin>
+    	<!-- Définition de la classe Main dans le Manifest lors de la génération du fichier JAR [Déplacée dans le projet parent] -->
+        <!--<plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-jar-plugin</artifactId>
             <configuration>
                 <archive>
                     <manifest>
-                        <mainClass>com.openclassroom.apache.batch.App</mainClass>
-                        <!-- Ajout du classpath pour que les classes soient automatiquement trouvées par la JVM -->
+                        <mainClass>${mainClass.address}</mainClass>
                         <addClasspath>true</addClasspath>
                         <classpathPrefix></classpathPrefix>
                     </manifest>
                 </archive>
             </configuration>
-        </plugin>        
+        </plugin>-->
 
         <!-- Création des archives de déploiement du batch -->
         <plugin>
